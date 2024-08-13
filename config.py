@@ -10,6 +10,7 @@ class Config:  # BaseSettings reads variables itself without the need to use 'en
     APP_NAME = os.environ.get("APP_NAME", "PyGame")
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 400
+    BOTTOM_PANEL = 150
     SQLALCHEMY_TRACK_MODIFICATIONS = os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
         os.path.abspath(os.path.dirname(__file__)), "database.sqlite"
