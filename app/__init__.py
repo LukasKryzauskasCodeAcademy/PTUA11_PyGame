@@ -50,8 +50,10 @@ class CreateApp:
             # Draw panel
             self.draw_panel()
             # Draw Fighters
+            self.knight.update()
             self.knight.draw(self.screen)
             for bandit in self.bandit_list:
+                bandit.update()
                 bandit.draw(self.screen)
 
             for event in pygame.event.get():
