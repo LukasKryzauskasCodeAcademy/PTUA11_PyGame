@@ -1,6 +1,6 @@
 import pygame
-import os
 from config import Config
+from .Fighter import Fighter
 
 conf = Config()
 
@@ -18,7 +18,7 @@ class CreateApp:
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption(conf.APP_NAME)
 
-    # Load images
+    # Load images TODO move image loading to a separate class
     # Background image
     background_img = pygame.image.load('app/img/Background/background.png').convert_alpha()
     # Panel image
@@ -33,6 +33,12 @@ class CreateApp:
     def draw_panel(self):
         self.screen.blit(self.panel_img, (0, self.screen_height - self.bottom_panel))
 
+    knight = Fighter(200, 260, 'Knight', 30, 10, 3)
+    bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
+    bandit2 = Fighter(700, 270, 'Bandit', 20, 6, 1)
+
+    bandit_list = [bandit1, bandit2]
+
     # Function for game loop
     def start(self):
         run = True
@@ -43,6 +49,10 @@ class CreateApp:
             self.draw_bg()
             # Draw panel
             self.draw_panel()
+            # Draw Fighters
+            self.knight.draw(self.screen)
+            for bandit in self.bandit_list:
+                bandit.draw(self.screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
