@@ -2,8 +2,7 @@ import pygame
 
 
 class Fighter:
-
-    def load_images(self, action_name):
+    def __load_images(self, action_name):
         temp_list = []
         for i in range(8):
             img = pygame.image.load(f'app/img/{self.name}/{action_name}/{i}.png')
@@ -26,11 +25,11 @@ class Fighter:
         self.action = 0  # 0-Idle, 1-Attack, 2-Hurt, 3-Dead
         self.update_time = pygame.time.get_ticks()
         # Load images
-        self.load_images('Idle')
-        self.load_images('Attack')
-        self.load_images('Hurt')
-        self.load_images('Death')
-        
+        self.__load_images('Idle')
+        self.__load_images('Attack')
+        self.__load_images('Hurt')
+        self.__load_images('Death')
+
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()  # Invisible property that shows width and height of image
         self.rect.center = (x, y)
