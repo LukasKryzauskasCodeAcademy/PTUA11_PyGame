@@ -1,60 +1,54 @@
 import pygame
 from config import Config
-from .Fighter import Fighter
+from .Fighter import Fighter, HealthBar
+from .Drawing import Drawer, screen, screen_width, bottom_panel, screen_height
 
 conf = Config()
+pygame.init()
+
+# Parameters
+fps = conf.FPS
+# Define fonts
+font = pygame.font.SysFont('Times New Roman', 26)
 
 
 class CreateApp:
-    pygame.init()
     # Parameters
     clock = pygame.time.Clock()
-    fps = 60
-    bottom_panel = conf.BOTTOM_PANEL
-    screen_width = conf.SCREEN_WIDTH
-    screen_height = conf.SCREEN_HEIGHT + bottom_panel
 
-    # Game window
-    screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption(conf.APP_NAME)
+    drawer = Drawer()
 
-    # Load images TODO move image loading to a separate class
-    # Background image
-    background_img = pygame.image.load('app/img/Background/background.png').convert_alpha()
-    # Panel image
-    panel_img = pygame.image.load('app/img/Icons/panel.png').convert_alpha()
-
-    # Function for drawing background
-    def draw_bg(self):
-        # blit() loads an image on specified window
-        self.screen.blit(self.background_img, (0, 0))
-
-    # Function for drawing panel
-    def draw_panel(self):
-        self.screen.blit(self.panel_img, (0, self.screen_height - self.bottom_panel))
-
+    # Create each fighter object
     knight = Fighter(200, 260, 'Knight', 30, 10, 3)
     bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
     bandit2 = Fighter(700, 270, 'Bandit', 20, 6, 1)
-
     bandit_list = [bandit1, bandit2]
+
+    # Create each fighters healthBar
+    knight_health_bar = HealthBar(100, screen_height - bottom_panel + 40, knight.hp, knight.max_hp)
+    bandit1_health_bar = HealthBar(550, screen_height - bottom_panel + 40, bandit1.hp, bandit1.max_hp)
+    bandit2_health_bar = HealthBar(550, screen_height - bottom_panel + 100, bandit2.hp, bandit2.max_hp)
 
     # Function for game loop
     def start(self):
         run = True
         while run:
 
-            self.clock.tick(self.fps)
+            self.clock.tick(fps)
             # Draw background
-            self.draw_bg()
+            self.drawer.draw_bg()
             # Draw panel
-            self.draw_panel()
+            self.drawer.draw_panel(self.knight, self.bandit_list)
+            self.knight_health_bar.draw(self.knight.hp, screen)
+            self.bandit1_health_bar.draw(self.bandit1.hp, screen)
+            self.bandit2_health_bar.draw(self.bandit2.hp, screen)
             # Draw Fighters
             self.knight.update()
-            self.knight.draw(self.screen)
+            self.knight.draw(screen)
             for bandit in self.bandit_list:
                 bandit.update()
-                bandit.draw(self.screen)
+                bandit.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

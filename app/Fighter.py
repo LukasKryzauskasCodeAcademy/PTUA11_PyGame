@@ -1,4 +1,5 @@
 import pygame
+from .Drawing import red, green
 
 
 class Fighter:
@@ -27,8 +28,8 @@ class Fighter:
         # Load images
         self.__load_images('Idle')
         self.__load_images('Attack')
-        self.__load_images('Hurt')
-        self.__load_images('Death')
+        # self.__load_images('Hurt')
+        # self.__load_images('Death')
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()  # Invisible property that shows width and height of image
@@ -49,3 +50,19 @@ class Fighter:
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+
+class HealthBar:
+    def __init__(self, x, y, hp, max_hp):
+        self.x = x
+        self.y = y
+        self.hp = hp
+        self.max_hp = max_hp
+
+    def draw(self, hp, screen):
+        # Update with new health
+        self.hp = hp
+        # Calculate health ratio
+        ratio = self.hp / self.max_hp
+        pygame.draw.rect(screen, red, (self.x, self.y, 150, 20))
+        pygame.draw.rect(screen, green, (self.x, self.y, 150 * ratio, 20))
