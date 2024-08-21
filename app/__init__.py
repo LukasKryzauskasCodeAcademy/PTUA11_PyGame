@@ -30,6 +30,12 @@ class CreateApp:
     bandit1_health_bar = HealthBar(550, screen_height - bottom_panel + 40, bandit1.hp, bandit1.max_hp)
     bandit2_health_bar = HealthBar(550, screen_height - bottom_panel + 100, bandit2.hp, bandit2.max_hp)
 
+    # Define game variables
+    current_fighter = 1  # 1- player
+    total_fighters = len(bandit_list) + current_fighter
+    action_cooldown = 0
+    action_wait_time = 90
+
     # Function for game loop
     def start(self):
         run = True
@@ -43,12 +49,41 @@ class CreateApp:
             self.knight_health_bar.draw(self.knight.hp, screen)
             self.bandit1_health_bar.draw(self.bandit1.hp, screen)
             self.bandit2_health_bar.draw(self.bandit2.hp, screen)
+
             # Draw Fighters
             self.knight.update()
             self.knight.draw(screen)
             for bandit in self.bandit_list:
                 bandit.update()
                 bandit.draw(screen)
+
+            # Player action
+            if self.knight.alive:
+                if self.current_fighter == 1:
+                    self.action_cooldown += 1
+                    if self.action_cooldown >= self.action_wait_time:
+                        # Look for player action
+                        # Attack
+                        self.knight.attack(self.bandit1)
+                        self.current_fighter += 1
+                        self.action_cooldown = 0
+
+            # Enemy action
+            for count, bandit in enumerate(self.bandit_list):
+                if self.current_fighter == 2 + count:
+                    if bandit.alive:
+                        self.action_cooldown += 1
+                        if self.action_cooldown >= self.action_wait_time:
+                            # Attack
+                            bandit.attack(self.knight)
+                            self.current_fighter += 1
+                            self.action_cooldown = 0
+                    else:
+                        self.current_fighter += 1
+
+            # If all fighter had a turn
+            if self.current_fighter > self.total_fighters:
+                self.current_fighter = 1
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

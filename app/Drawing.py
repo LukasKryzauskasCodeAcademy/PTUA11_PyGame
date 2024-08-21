@@ -21,14 +21,14 @@ class Drawer:
     # Panel image
     panel_img = pygame.image.load('app/img/Icons/panel.png').convert_alpha()
 
-    # Create function for drawing text
+    # Function for drawing text
     def draw_text(self, text, font, text_color, x, y):
         img = font.render(text, True, text_color)
         screen.blit(img, (x, y))
 
     # Function for drawing background
     def draw_bg(self):
-        # blit() loads an image on specified window
+        # blit() loads an image on specified window, and position
         screen.blit(self.background_img, (0, 0))
 
     # Function for drawing panel

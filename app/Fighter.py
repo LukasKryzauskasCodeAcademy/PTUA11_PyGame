@@ -1,11 +1,12 @@
 import pygame
+import random
 from .Drawing import red, green
 
 
 class Fighter:
-    def __load_images(self, action_name):
+    def __load_images(self, action_name, frames):
         temp_list = []
-        for i in range(8):
+        for i in range(frames):
             img = pygame.image.load(f'app/img/{self.name}/{action_name}/{i}.png')
             # This is for up scaling the image, because it's too small, scaling three times in each direction
             img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
@@ -26,10 +27,10 @@ class Fighter:
         self.action = 0  # 0-Idle, 1-Attack, 2-Hurt, 3-Dead
         self.update_time = pygame.time.get_ticks()
         # Load images
-        self.__load_images('Idle')
-        self.__load_images('Attack')
-        # self.__load_images('Hurt')
-        # self.__load_images('Death')
+        self.__load_images('Idle', 8)
+        self.__load_images('Attack', 8)
+        self.__load_images('Hurt', 3)
+        self.__load_images('Death', 10)
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()  # Invisible property that shows width and height of image
@@ -46,7 +47,23 @@ class Fighter:
             self.frame_index += 1
         # if animation reaches the end then restart
         if self.frame_index >= len(self.animation_list[self.action]):
-            self.frame_index = 0
+            self.idle()
+
+    def idle(self):
+        # set variables to attack animation
+        self.action = 0
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
+
+    def attack(self, target):
+        rand = random.randint(-5, 5)
+        damage = self.strength + rand
+        # deal damage to enemy
+        target.hp -= damage
+        #set variables to attack animation
+        self.action = 1
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
