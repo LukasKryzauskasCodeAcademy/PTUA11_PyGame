@@ -13,6 +13,9 @@ screen_height = conf.SCREEN_HEIGHT + bottom_panel
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 
+# Define fonts
+font = pygame.font.SysFont('Times New Roman', 26)
+
 
 class Drawer:
     # Load images
@@ -26,7 +29,7 @@ class Drawer:
     potion_img = pygame.image.load('app/img/Icons/potion.png').convert_alpha()
 
     # Function for drawing text
-    def draw_text(self, text, font, text_color, x, y):
+    def draw_text(self, text, text_color, x, y):
         img = font.render(text, True, text_color)
         screen.blit(img, (x, y))
 
@@ -37,13 +40,30 @@ class Drawer:
 
     # Function for drawing panel
     def draw_panel(self, knight, bandit_list):
-        from app import font
         # Draw panel rectangle
         screen.blit(self.panel_img, (0, screen_height - bottom_panel))
         # Show knight stats
-        self.draw_text(f'{knight.name} HP: {knight.hp}', font, red, 100,
+        self.draw_text(f'{knight.name} HP: {knight.hp}', red, 100,
                        screen_height - bottom_panel + 10)
         for count, bandit in enumerate(bandit_list):
             # Show name and health for each bandit
-            self.draw_text(f'{bandit.name} HP: {bandit.hp}', font, red, 550,
+            self.draw_text(f'{bandit.name} HP: {bandit.hp}', red, 550,
                            (screen_height - bottom_panel + 10) + count * 60)
+
+
+# Sprite class has an inbuilt draw and update method
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = font.render(damage, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+
+    def update(self):
+        # Move damage text up
+        self.rect.y -= 1
+        # Delete text after a few seconds
+        self.counter += 1
+        if self.counter > 30:
+            self.kill()

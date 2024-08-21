@@ -1,17 +1,17 @@
 import pygame
+pygame.init()
 from config import Config
 from .Fighter import Fighter, HealthBar
-from .Drawing import Drawer, red, screen, screen_width, bottom_panel, screen_height
+from .Drawing import Drawer, DamageText, green, red, screen, screen_width, bottom_panel, screen_height
 from .Button import Button
 
 conf = Config()
-pygame.init()
 
 # Parameters
 fps = conf.FPS
-# Define fonts
-font = pygame.font.SysFont('Times New Roman', 26)
 
+# Group is similar to python list
+damage_text_group = pygame.sprite.Group()
 
 class CreateApp:
     # Parameters
@@ -64,6 +64,10 @@ class CreateApp:
                 bandit.update()
                 bandit.draw(screen)
 
+            # Draw damage text
+            damage_text_group.update()
+            damage_text_group.draw(screen)
+
             # Control player actions
             # Reset action variables
             self.attack = False
@@ -86,7 +90,7 @@ class CreateApp:
             # Draw buttons
             if potion_button.draw():
                 self.potion = True
-            self.drawer.draw_text(str(self.knight.potions), font, red, 150, screen_height - bottom_panel + 70)
+            self.drawer.draw_text(str(self.knight.potions), red, 150, screen_height - bottom_panel + 70)
 
             # Player action
             if self.knight.alive:
@@ -110,6 +114,10 @@ class CreateApp:
                                     heal_amount = self.knight.max_hp - self.knight.hp
                                 self.knight.hp += heal_amount
                                 self.knight.potions -= 1
+                                # Healing text
+                                damage_text = DamageText(self.knight.rect.centerx, self.knight.rect.y, str(heal_amount),
+                                                         green)
+                                damage_text_group.add(damage_text)
 
                                 self.current_fighter += 1
                                 self.action_cooldown = 0
@@ -129,6 +137,10 @@ class CreateApp:
                                     heal_amount = bandit.max_hp - bandit.hp
                                 bandit.hp += heal_amount
                                 bandit.potions -= 1
+                                # Healing text
+                                damage_text = DamageText(bandit.rect.centerx, bandit.rect.y, str(heal_amount),
+                                                         green)
+                                damage_text_group.add(damage_text)
 
                                 self.current_fighter += 1
                                 self.action_cooldown = 0
