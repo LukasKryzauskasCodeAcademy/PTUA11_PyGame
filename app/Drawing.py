@@ -20,6 +20,7 @@ class Drawer:
     background_img = pygame.image.load('app/img/Background/background.png').convert_alpha()
     # Panel image
     panel_img = pygame.image.load('app/img/Icons/panel.png').convert_alpha()
+    sword_img = pygame.image.load('app/img/Icons/sword.png').convert_alpha()
 
     # Function for drawing text
     def draw_text(self, text, font, text_color, x, y):

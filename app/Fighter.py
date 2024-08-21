@@ -58,9 +58,13 @@ class Fighter:
     def attack(self, target):
         rand = random.randint(-5, 5)
         damage = self.strength + rand
-        # deal damage to enemy
+        # Deal damage to enemy
         target.hp -= damage
-        #set variables to attack animation
+        # Check if target is dead
+        if target.hp < 1:
+            target.hp = 0
+            target.alive = False
+        # Set variables to attack animation
         self.action = 1
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()

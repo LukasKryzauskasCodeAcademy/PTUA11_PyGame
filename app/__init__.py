@@ -35,6 +35,9 @@ class CreateApp:
     total_fighters = len(bandit_list) + current_fighter
     action_cooldown = 0
     action_wait_time = 90
+    attack = False
+    potion = False
+    clicked = False
 
     # Function for game loop
     def start(self):
@@ -57,6 +60,25 @@ class CreateApp:
                 bandit.update()
                 bandit.draw(screen)
 
+            # Control player actions
+            # Reset action variables
+            self.attack = False
+            self.potion = False
+            target = None
+            # Make sure mouse is Visible
+            pygame.mouse.set_visible(True)
+            # Get mouse position
+            pos = pygame.mouse.get_pos()
+            for count, bandit in enumerate(self.bandit_list):
+                if bandit.rect.collidepoint(pos):
+                    # Hide mouse
+                    pygame.mouse.set_visible(False)
+                    # Show sword in place of mouse cursor
+                    screen.blit(self.drawer.sword_img, pos)
+                    if self.clicked:
+                        self.attack = True
+                        target = self.bandit_list[count]
+
             # Player action
             if self.knight.alive:
                 if self.current_fighter == 1:
@@ -64,9 +86,10 @@ class CreateApp:
                     if self.action_cooldown >= self.action_wait_time:
                         # Look for player action
                         # Attack
-                        self.knight.attack(self.bandit1)
-                        self.current_fighter += 1
-                        self.action_cooldown = 0
+                        if self.attack and target is not None:
+                            self.knight.attack(target)
+                            self.current_fighter += 1
+                            self.action_cooldown = 0
 
             # Enemy action
             for count, bandit in enumerate(self.bandit_list):
@@ -88,6 +111,10 @@ class CreateApp:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.clicked = True
+                else:
+                    self.clicked = False
 
             pygame.display.update()
 
