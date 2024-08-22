@@ -83,7 +83,7 @@ class CreateApp:
                     pygame.mouse.set_visible(False)
                     # Show sword in place of mouse cursor
                     screen.blit(self.drawer.sword_img, pos)
-                    if self.clicked:
+                    if self.clicked and bandit.alive:
                         self.attack = True
                         target = self.bandit_list[count]
 

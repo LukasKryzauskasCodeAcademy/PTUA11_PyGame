@@ -47,11 +47,14 @@ class Fighter:
             self.frame_index += 1
         # if animation reaches the end then restart
         if self.frame_index >= len(self.animation_list[self.action]):
-            self.idle()
+            if self.action == 3:
+                self.frame_index = len(self.animation_list[self.action]) - 1
+            else:
+                self.animation(0)
 
-    def idle(self):
-        # set variables to attack animation
-        self.action = 0
+    def animation(self, action):
+        # set variables for animation, action determines the animation, 0-Idle, 1-Attack, 2-Hurt, 3-Dead
+        self.action = action
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
 
@@ -62,16 +65,18 @@ class Fighter:
         damage = self.strength + rand
         # Deal damage to enemy
         target.hp -= damage
+        # Run enemy hurt animation
+        target.animation(2)
         # Check if target is dead
         if target.hp < 1:
             target.hp = 0
             target.alive = False
+            target.animation(3)
         damage_text = DamageText(target.rect.centerx, target.rect.y, str(damage), red)
         damage_text_group.add(damage_text)
         # Set variables to attack animation
-        self.action = 1
-        self.frame_index = 0
-        self.update_time = pygame.time.get_ticks()
+        self.animation(1)
+
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
