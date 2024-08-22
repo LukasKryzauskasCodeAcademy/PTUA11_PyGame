@@ -5,6 +5,7 @@ from config import Config
 from .Fighter import Fighter, HealthBar
 from .Drawing import Drawer, DamageText, green, red, screen, screen_width, bottom_panel, screen_height
 from .Button import Button
+from .Audio import AudioPlayer
 
 conf = Config()
 
@@ -106,6 +107,7 @@ class CreateApp:
                             # Attack
                             if self.attack and target is not None:
                                 self.knight.attack(target)
+                                AudioPlayer.sword_hit.play()
 
                                 self.current_fighter += 1
                                 self.action_cooldown = 0
@@ -119,6 +121,7 @@ class CreateApp:
                                         heal_amount = self.knight.max_hp - self.knight.hp
                                     self.knight.hp += heal_amount
                                     self.knight.potions -= 1
+                                    AudioPlayer.potion.play()
                                     # Healing text
                                     damage_text = DamageText(self.knight.rect.centerx, self.knight.rect.y,
                                                              str(heal_amount),
@@ -145,6 +148,7 @@ class CreateApp:
                                         heal_amount = bandit.max_hp - bandit.hp
                                     bandit.hp += heal_amount
                                     bandit.potions -= 1
+                                    AudioPlayer.potion.play()
                                     # Healing text
                                     damage_text = DamageText(bandit.rect.centerx, bandit.rect.y, str(heal_amount),
                                                              green)
@@ -155,6 +159,7 @@ class CreateApp:
                                 # Attack
                                 else:
                                     bandit.attack(self.knight)
+                                    AudioPlayer.sword_hit.play()
                                     self.current_fighter += 1
                                     self.action_cooldown = 0
                         else:
