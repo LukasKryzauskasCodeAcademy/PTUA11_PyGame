@@ -77,6 +77,13 @@ class Fighter:
         # Set variables to attack animation
         self.animation(1)
 
+    def reset(self):
+        self.alive = True
+        self.potions = self.start_potions
+        self.hp = self.max_hp
+        self.frame_index = 0
+        self.action = 0
+        self.update_time = pygame.time.get_ticks()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)

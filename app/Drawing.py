@@ -27,6 +27,10 @@ class Drawer:
     sword_img = pygame.image.load('app/img/Icons/sword.png').convert_alpha()
     # Button images
     potion_img = pygame.image.load('app/img/Icons/potion.png').convert_alpha()
+    restart_img = pygame.image.load('app/img/Icons/restart.png').convert_alpha()
+    # Load Victory and Defeat images
+    victory_img = pygame.image.load('app/img/Icons/victory.png').convert_alpha()
+    defeat_img = pygame.image.load('app/img/Icons/defeat.png').convert_alpha()
 
     # Function for drawing text
     def draw_text(self, text, text_color, x, y):
