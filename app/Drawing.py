@@ -3,10 +3,6 @@ from config import Config
 
 conf = Config()
 
-# Define colors
-red = (255, 0, 0)
-green = (0, 255, 0)
-white = (255, 255, 255)
 # Game window
 bottom_panel = conf.BOTTOM_PANEL
 screen_width = conf.SCREEN_WIDTH
@@ -18,6 +14,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 font = pygame.font.SysFont('Times New Roman', 26)
 
 # Function for drawing text
+#TODO change the x, y coordinates to be text center not top left corner
 def draw_text(text, text_color, x, y):
     img = font.render(text, True, text_color)
     screen.blit(img, (x, y))
@@ -56,11 +53,11 @@ class Drawer:
         # Draw panel rectangle
         screen.blit(self.panel_img, (0, screen_height - bottom_panel))
         # Show knight stats
-        draw_text(f'{knight.name} HP: {knight.hp}', red, 100,
+        draw_text(f'{knight.name} HP: {knight.hp}', "red", 100,
                        screen_height - bottom_panel + 10)
         for count, bandit in enumerate(bandit_list):
             # Show name and health for each bandit
-            draw_text(f'{bandit.name} HP: {bandit.hp}', red, 550,
+            draw_text(f'{bandit.name} HP: {bandit.hp}', "red", 550,
                            (screen_height - bottom_panel + 10) + count * 60)
 
 

@@ -3,9 +3,9 @@ import pygame
 pygame.init()
 from config import Config
 from .Fighter import Fighter, HealthBar
-from .Drawing import Drawer, DamageText, draw_text, green, red, white, screen, screen_width, bottom_panel, screen_height
-from .Button import Button
-from .Audio import AudioPlayer
+from .Drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom_panel, screen_height
+from .Widgets import Button, Slider
+from .Audio import AudioPlayer, set_music_volume
 
 conf = Config()
 
@@ -15,6 +15,7 @@ fps = conf.FPS
 # Group is similar to python list
 damage_text_group = pygame.sprite.Group()
 drawer = Drawer()
+audio = AudioPlayer()
 
 
 def combat_loop():
@@ -91,7 +92,7 @@ def combat_loop():
         # Draw buttons
         if potion_button.draw():
             potion = True
-        draw_text(str(knight.potions), red, 150, screen_height - bottom_panel + 70)
+        draw_text(str(knight.potions), "red", 150, screen_height - bottom_panel + 70)
 
         if game_over == 0:
             # Player action
@@ -103,7 +104,7 @@ def combat_loop():
                         # Attack
                         if attack and target is not None:
                             knight.attack(target)
-                            AudioPlayer.sword_hit.play()
+                            audio.sword_hit.play()
 
                             current_fighter += 1
                             action_cooldown = 0
@@ -117,11 +118,11 @@ def combat_loop():
                                     heal_amount = knight.max_hp - knight.hp
                                 knight.hp += heal_amount
                                 knight.potions -= 1
-                                AudioPlayer.potion.play()
+                                audio.potion.play()
                                 # Healing text
                                 damage_text = DamageText(knight.rect.centerx, knight.rect.y,
                                                          str(heal_amount),
-                                                         green)
+                                                         "green")
                                 damage_text_group.add(damage_text)
 
                                 current_fighter += 1
@@ -144,10 +145,10 @@ def combat_loop():
                                     heal_amount = bandit.max_hp - bandit.hp
                                 bandit.hp += heal_amount
                                 bandit.potions -= 1
-                                AudioPlayer.potion.play()
+                                audio.potion.play()
                                 # Healing text
                                 damage_text = DamageText(bandit.rect.centerx, bandit.rect.y, str(heal_amount),
-                                                         green)
+                                                         "green")
                                 damage_text_group.add(damage_text)
 
                                 current_fighter += 1
@@ -155,7 +156,7 @@ def combat_loop():
                             # Attack
                             else:
                                 bandit.attack(knight)
-                                AudioPlayer.sword_hit.play()
+                                audio.sword_hit.play()
                                 current_fighter += 1
                                 action_cooldown = 0
                     else:
@@ -214,11 +215,18 @@ class CreateApp:
     audio_button = Button(screen, screen_width / 2 - 150, 200, drawer.button_img, 300, 80)
     back_button = Button(screen, screen_width / 2 - 65, 450, drawer.button_img, 130, 80)
 
+    # Audio slider
+    sliders = [
+        Slider((screen_width // 2, screen_height // 2 - 100), (200, 30), audio.music_volume, 0, 1),
+        Slider((screen_width // 2, screen_height // 2), (200, 30), audio.effects_volume, 0, 100)
+    ]
+
     # Game loop
     run = True
     while run:
         screen.fill((52, 78, 91))
-
+        mouse_pos = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
         # Check if game is paused
         if game_paused:
             # Check menu state
@@ -230,15 +238,28 @@ class CreateApp:
                     menu_state = "options"
                 if quit_button.draw("Quit"):
                     run = False
-            else:
+            elif menu_state == "options":
                 # Display options menu
                 if audio_button.draw("Audio"):
-                    pass
+                    menu_state = "audio"
                 if back_button.draw("Back"):
                     menu_state = "main"
+            elif menu_state == "audio":
+                draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
+                draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
+                for count, slider in enumerate(sliders):
+                    if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
+                        slider.move_slider(mouse_pos)
+                        if count == 0:
+                            set_music_volume(slider.get_value())
+                        elif count == 1:
+                            audio.set_effects_volume(slider.get_value())
+                    slider.render(screen)
+                if back_button.draw("Back"):
+                    menu_state = "options"
         else:
             # Keep running the game
-            draw_text("Press ESC to pause", white, 320, 250)
+            draw_text("Press ESC to pause", "white", 300, 250)
 
         # Event handler
         for event in pygame.event.get():
@@ -249,6 +270,6 @@ class CreateApp:
                 run = False
         pygame.display.update()
 
-    # combat_loop()
+    #combat_loop()
 
     pygame.quit()

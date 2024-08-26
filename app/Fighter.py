@@ -1,6 +1,6 @@
 import pygame
 import random
-from .Drawing import red, green, DamageText
+from .Drawing import DamageText
 
 
 class Fighter:
@@ -72,7 +72,7 @@ class Fighter:
             target.hp = 0
             target.alive = False
             target.animation(3)
-        damage_text = DamageText(target.rect.centerx, target.rect.y, str(damage), red)
+        damage_text = DamageText(target.rect.centerx, target.rect.y, str(damage), "red")
         damage_text_group.add(damage_text)
         # Set variables to attack animation
         self.animation(1)
@@ -101,5 +101,5 @@ class HealthBar:
         self.hp = hp
         # Calculate health ratio
         ratio = self.hp / self.max_hp
-        pygame.draw.rect(screen, red, (self.x, self.y, 150, 20))
-        pygame.draw.rect(screen, green, (self.x, self.y, 150 * ratio, 20))
+        pygame.draw.rect(screen, "red", (self.x, self.y, 150, 20))
+        pygame.draw.rect(screen, "green", (self.x, self.y, 150 * ratio, 20))
