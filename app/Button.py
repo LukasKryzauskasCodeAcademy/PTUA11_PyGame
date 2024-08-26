@@ -1,6 +1,7 @@
 import pygame
+from .Drawing import draw_button_text, white
 
-#TODO maybe move to Drawing class
+
 class Button:
     def __init__(self, surface, x, y, image, size_x, size_y):
         self.image = pygame.transform.scale(image, (size_x, size_y))
@@ -9,9 +10,8 @@ class Button:
         self.clicked = False
         self.surface = surface
 
-    def draw(self):
+    def draw(self, text=None):
         action = False
-
         # Get mouse position
         pos = pygame.mouse.get_pos()
 
@@ -26,5 +26,8 @@ class Button:
 
         # Draw button
         self.surface.blit(self.image, (self.rect.x, self.rect.y))
+        # Draw text on top
+        if text:
+            draw_button_text(text, white, self.rect.x, self.rect.y, self.rect)
 
         return action

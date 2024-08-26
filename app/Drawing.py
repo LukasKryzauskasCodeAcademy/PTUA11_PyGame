@@ -17,6 +17,17 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # Define fonts
 font = pygame.font.SysFont('Times New Roman', 26)
 
+# Function for drawing text
+def draw_text(text, text_color, x, y):
+    img = font.render(text, True, text_color)
+    screen.blit(img, (x, y))
+
+
+def draw_button_text(text, text_color, x, y, image_rect):
+    text = font.render(text, True, text_color)
+    text_rect = text.get_rect(center=(image_rect.width / 2 + x, image_rect.height / 2 + y))
+    screen.blit(text, text_rect)
+
 
 class Drawer:
     # Load images
@@ -29,21 +40,11 @@ class Drawer:
     # Button images
     potion_img = pygame.image.load('app/img/Icons/potion.png').convert_alpha()
     restart_img = pygame.image.load('app/img/Icons/restart.png').convert_alpha()
-    # Menu buttons
-    resume_img = pygame.image.load('app/img/Buttons/button_resume.png').convert_alpha()
-    options_img = pygame.image.load('app/img/Buttons/button_options.png').convert_alpha()
-    quit_img = pygame.image.load('app/img/Buttons/button_quit.png').convert_alpha()
 
-    audio_img = pygame.image.load('app/img/Buttons/button_audio.png').convert_alpha()
-    back_img = pygame.image.load('app/img/Buttons/button_back.png').convert_alpha()
+    button_img = pygame.image.load('app/img/Icons/button.png').convert_alpha()
     # Load Victory and Defeat images
     victory_img = pygame.image.load('app/img/Icons/victory.png').convert_alpha()
     defeat_img = pygame.image.load('app/img/Icons/defeat.png').convert_alpha()
-
-    # Function for drawing text
-    def draw_text(self, text, text_color, x, y):
-        img = font.render(text, True, text_color)
-        screen.blit(img, (x, y))
 
     # Function for drawing background
     def draw_bg(self):
@@ -55,11 +56,11 @@ class Drawer:
         # Draw panel rectangle
         screen.blit(self.panel_img, (0, screen_height - bottom_panel))
         # Show knight stats
-        self.draw_text(f'{knight.name} HP: {knight.hp}', red, 100,
+        draw_text(f'{knight.name} HP: {knight.hp}', red, 100,
                        screen_height - bottom_panel + 10)
         for count, bandit in enumerate(bandit_list):
             # Show name and health for each bandit
-            self.draw_text(f'{bandit.name} HP: {bandit.hp}', red, 550,
+            draw_text(f'{bandit.name} HP: {bandit.hp}', red, 550,
                            (screen_height - bottom_panel + 10) + count * 60)
 
 

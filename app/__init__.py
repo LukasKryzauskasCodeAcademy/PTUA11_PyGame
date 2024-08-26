@@ -3,7 +3,7 @@ import pygame
 pygame.init()
 from config import Config
 from .Fighter import Fighter, HealthBar
-from .Drawing import Drawer, DamageText, green, red, white, screen, screen_width, bottom_panel, screen_height
+from .Drawing import Drawer, DamageText, draw_text, green, red, white, screen, screen_width, bottom_panel, screen_height
 from .Button import Button
 from .Audio import AudioPlayer
 
@@ -91,7 +91,7 @@ def combat_loop():
         # Draw buttons
         if potion_button.draw():
             potion = True
-        drawer.draw_text(str(knight.potions), red, 150, screen_height - bottom_panel + 70)
+        draw_text(str(knight.potions), red, 150, screen_height - bottom_panel + 70)
 
         if game_over == 0:
             # Player action
@@ -207,12 +207,12 @@ class CreateApp:
     menu_state = "main"
 
     # Create button instances
-    resume_button = Button(screen, 304, 125, drawer.resume_img, 191, 82)
-    options_button = Button(screen, 297, 250, drawer.options_img, 205, 82)
-    quit_button = Button(screen, 336, 375, drawer.quit_img, 128, 82)
+    resume_button = Button(screen, screen_width / 2 - 100, 125, drawer.button_img, 200, 80)
+    options_button = Button(screen, screen_width / 2 - 75, 250, drawer.button_img, 150, 80)
+    quit_button = Button(screen, screen_width / 2 - 75, 375, drawer.button_img, 150, 80)
 
-    audio_button = Button(screen, 225, 200, drawer.audio_img, 349, 82)
-    back_button = Button(screen, 332, 450, drawer.back_img, 135, 82)
+    audio_button = Button(screen, screen_width / 2 - 150, 200, drawer.button_img, 300, 80)
+    back_button = Button(screen, screen_width / 2 - 65, 450, drawer.button_img, 130, 80)
 
     # Game loop
     run = True
@@ -224,21 +224,21 @@ class CreateApp:
             # Check menu state
             if menu_state == "main":
                 # Display pause screen menu
-                if resume_button.draw():
+                if resume_button.draw("Resume"):
                     game_paused = False
-                if options_button.draw():
+                if options_button.draw("Options"):
                     menu_state = "options"
-                if quit_button.draw():
+                if quit_button.draw("Quit"):
                     run = False
             else:
                 # Display options menu
-                if audio_button.draw():
+                if audio_button.draw("Audio"):
                     pass
-                if back_button.draw():
+                if back_button.draw("Back"):
                     menu_state = "main"
         else:
             # Keep running the game
-            drawer.draw_text("Press ESC to pause", white, 320, 250)
+            draw_text("Press ESC to pause", white, 320, 250)
 
         # Event handler
         for event in pygame.event.get():
