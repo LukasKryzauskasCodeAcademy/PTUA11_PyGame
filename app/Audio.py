@@ -8,7 +8,7 @@ class AudioPlayer:
     pygame.mixer.music.load('app/audio/Combat.mp3')
     pygame.mixer.music.set_volume(0.3)
     # Loop background music infinitely
-    pygame.mixer.music.play(-1,0.0)
+    #pygame.mixer.music.play(-1,0.0)
 
     sword_hit = pygame.mixer.Sound('app/audio/Sword_hit.wav')
     sword_hit.set_volume(0.5)

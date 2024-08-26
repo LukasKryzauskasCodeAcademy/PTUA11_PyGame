@@ -6,6 +6,7 @@ conf = Config()
 # Define colors
 red = (255, 0, 0)
 green = (0, 255, 0)
+white = (255, 255, 255)
 # Game window
 bottom_panel = conf.BOTTOM_PANEL
 screen_width = conf.SCREEN_WIDTH
@@ -28,6 +29,13 @@ class Drawer:
     # Button images
     potion_img = pygame.image.load('app/img/Icons/potion.png').convert_alpha()
     restart_img = pygame.image.load('app/img/Icons/restart.png').convert_alpha()
+    # Menu buttons
+    resume_img = pygame.image.load('app/img/Buttons/button_resume.png').convert_alpha()
+    options_img = pygame.image.load('app/img/Buttons/button_options.png').convert_alpha()
+    quit_img = pygame.image.load('app/img/Buttons/button_quit.png').convert_alpha()
+
+    audio_img = pygame.image.load('app/img/Buttons/button_audio.png').convert_alpha()
+    back_img = pygame.image.load('app/img/Buttons/button_back.png').convert_alpha()
     # Load Victory and Defeat images
     victory_img = pygame.image.load('app/img/Icons/victory.png').convert_alpha()
     defeat_img = pygame.image.load('app/img/Icons/defeat.png').convert_alpha()
