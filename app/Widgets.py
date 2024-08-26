@@ -56,7 +56,7 @@ class Slider:
 
     def render(self, surface):
         pygame.draw.rect(surface, "darkgray", self.container_rect)
-        pygame.draw.rect(surface, "blue", self.button_rect)
+        pygame.draw.rect(surface, "red", self.button_rect)
 
     def get_value(self):
         # -1 is padding because of pixel precision

@@ -1,4 +1,5 @@
 import pygame
+from tkinter import messagebox
 
 pygame.init()
 from config import Config
@@ -10,7 +11,12 @@ from .Audio import AudioPlayer, set_music_volume
 conf = Config()
 
 # Parameters
+clock = pygame.time.Clock()
 fps = conf.FPS
+
+# Game variables
+game_paused = True
+menu_state = "main"
 
 # Group is similar to python list
 damage_text_group = pygame.sprite.Group()
@@ -18,10 +24,90 @@ drawer = Drawer()
 audio = AudioPlayer()
 
 
-def combat_loop():
-    # Parameters
-    clock = pygame.time.Clock()
+def menu():
+    global game_paused, menu_state
+    # Create button instances
+    play_button = Button(screen, screen_width / 2 - 100, 100, drawer.button_img, 200, 80)
+    resume_button = Button(screen, screen_width / 2 - 100, 200, drawer.button_img, 200, 80)
+    options_button = Button(screen, screen_width / 2 - 75, 300, drawer.button_img, 150, 80)
+    quit_button = Button(screen, screen_width / 2 - 75, 400, drawer.button_img, 150, 80)
 
+    audio_button = Button(screen, screen_width / 2 - 150, 200, drawer.button_img, 300, 80)
+    back_button = Button(screen, screen_width / 2 - 65, 450, drawer.button_img, 130, 80)
+
+    # Audio slider
+    music_slider = Slider((screen_width // 2, screen_height // 2 - 100), (200, 30), audio.music_volume, 0, 1)
+    effects_slider = Slider((screen_width // 2, screen_height // 2), (200, 30), audio.effects_volume, 0, 100)
+    sliders = [music_slider, effects_slider]
+
+    # Game loop
+    run = True
+    while run:
+        clock.tick(fps)
+        screen.fill((52, 78, 91))
+        mouse_pos = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
+        # Check if game is paused
+        if game_paused:
+            # Check menu state
+            if menu_state == "main":
+                # Display main menu
+                if play_button.draw("Play"):
+                    menu_state = "pause"
+                    game_paused = False
+                    combat_loop()
+                if options_button.draw("Options"):
+                    menu_state = "options"
+                if quit_button.draw("Quit"):
+                    if messagebox.askquestion('Are you sure?','Do you want to quit?') == messagebox.YES:
+                        run = False
+            elif menu_state == "pause":
+                # Display pause screen menu
+                if resume_button.draw("Resume"):
+                    game_paused = False
+                if options_button.draw("Options"):
+                    menu_state = "options"
+                if quit_button.draw("Quit"):
+                    if messagebox.askquestion('Are you sure?','Do you want to save before quitting?') == messagebox.YES:
+                        #TODO implement saving
+                        pass
+                    else:
+                        run = False
+            elif menu_state == "options":
+                # Display options menu
+                if audio_button.draw("Audio"):
+                    menu_state = "audio"
+                if back_button.draw("Back"):
+                    menu_state = "main"
+            elif menu_state == "audio":
+                draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
+                draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
+                for count, slider in enumerate(sliders):
+                    if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
+                        slider.move_slider(mouse_pos)
+                        if count == 0:
+                            set_music_volume(slider.get_value())
+                        elif count == 1:
+                            audio.set_effects_volume(slider.get_value())
+                    slider.render(screen)
+                if back_button.draw("Back"):
+                    menu_state = "options"
+        else:
+            game_paused = False
+            run = False
+
+        # Event handler
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = True
+            if event.type == pygame.QUIT:
+                run = False
+        pygame.display.update()
+
+
+def combat_loop():
+    global game_paused, menu_state
     # Create each fighter object
     knight = Fighter(200, 260, 'Knight', 30, 10, 3)
     bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
@@ -39,15 +125,16 @@ def combat_loop():
     action_cooldown = 0
     action_wait_time = 90
     potion_effect = 15
-    clicked = False
     game_over = 0
 
     # Function for game loop
 
     run = True
     while run:
-
         clock.tick(fps)
+
+        if game_paused:
+            menu()
         # Draw background
         drawer.draw_bg()
         # Draw panel
@@ -72,6 +159,7 @@ def combat_loop():
 
         # Control player actions
         # Reset action variables
+        mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
         attack = False
         potion = False
         target = None
@@ -85,7 +173,7 @@ def combat_loop():
                 pygame.mouse.set_visible(False)
                 # Show sword in place of mouse cursor
                 screen.blit(drawer.sword_img, pos)
-                if clicked and bandit.alive:
+                if mouse[0] and bandit.alive:
                     attack = True
                     target = bandit_list[count]
 
@@ -189,12 +277,12 @@ def combat_loop():
                 game_over = 0
 
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = True
+                    menu_state = "pause"
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                clicked = True
-            else:
-                clicked = False
 
         pygame.display.update()
 
@@ -202,74 +290,5 @@ def combat_loop():
 class CreateApp:
     # Parameters
     pygame.display.set_caption(conf.APP_NAME)
-
-    # Game variables
-    game_paused = False
-    menu_state = "main"
-
-    # Create button instances
-    resume_button = Button(screen, screen_width / 2 - 100, 125, drawer.button_img, 200, 80)
-    options_button = Button(screen, screen_width / 2 - 75, 250, drawer.button_img, 150, 80)
-    quit_button = Button(screen, screen_width / 2 - 75, 375, drawer.button_img, 150, 80)
-
-    audio_button = Button(screen, screen_width / 2 - 150, 200, drawer.button_img, 300, 80)
-    back_button = Button(screen, screen_width / 2 - 65, 450, drawer.button_img, 130, 80)
-
-    # Audio slider
-    sliders = [
-        Slider((screen_width // 2, screen_height // 2 - 100), (200, 30), audio.music_volume, 0, 1),
-        Slider((screen_width // 2, screen_height // 2), (200, 30), audio.effects_volume, 0, 100)
-    ]
-
-    # Game loop
-    run = True
-    while run:
-        screen.fill((52, 78, 91))
-        mouse_pos = pygame.mouse.get_pos()
-        mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
-        # Check if game is paused
-        if game_paused:
-            # Check menu state
-            if menu_state == "main":
-                # Display pause screen menu
-                if resume_button.draw("Resume"):
-                    game_paused = False
-                if options_button.draw("Options"):
-                    menu_state = "options"
-                if quit_button.draw("Quit"):
-                    run = False
-            elif menu_state == "options":
-                # Display options menu
-                if audio_button.draw("Audio"):
-                    menu_state = "audio"
-                if back_button.draw("Back"):
-                    menu_state = "main"
-            elif menu_state == "audio":
-                draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
-                draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
-                for count, slider in enumerate(sliders):
-                    if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
-                        slider.move_slider(mouse_pos)
-                        if count == 0:
-                            set_music_volume(slider.get_value())
-                        elif count == 1:
-                            audio.set_effects_volume(slider.get_value())
-                    slider.render(screen)
-                if back_button.draw("Back"):
-                    menu_state = "options"
-        else:
-            # Keep running the game
-            draw_text("Press ESC to pause", "white", 300, 250)
-
-        # Event handler
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    game_paused = True
-            if event.type == pygame.QUIT:
-                run = False
-        pygame.display.update()
-
-    #combat_loop()
-
+    menu()
     pygame.quit()
