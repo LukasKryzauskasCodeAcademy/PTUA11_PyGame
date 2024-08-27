@@ -33,7 +33,7 @@ class AudioPlayer:
 
     # Load music and sounds
     def load_audio(self):
-        pygame.mixer.music.load('app/audio/Combat.mp3')
+        self.load_music("Menu")
 
         self.sword_hit = pygame.mixer.Sound('app/audio/Sword_hit.wav')
         self.sword_hit.set_volume(self.effects_volume)
@@ -42,6 +42,10 @@ class AudioPlayer:
         self.potion.set_volume(self.effects_volume)
 
         self.sound_effects = [self.sword_hit, self.potion]
+        set_music_volume(self.music_volume)
+
+    def load_music(self, name):
+        pygame.mixer.music.load(f'app/audio/{name}.mp3')
         set_music_volume(self.music_volume)
 
     def set_effects_volume(self, volume: float):

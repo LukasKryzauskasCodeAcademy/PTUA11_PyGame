@@ -61,9 +61,11 @@ def menu():
             # Check menu state
             if menu_state == "main":
                 # Display main menu
+                draw_text("Pygame rpg project", "red", 290, 100)
                 if play_button.draw("Play"):
                     menu_state = "pause"
                     game_paused = False
+                    audio.load_music("Combat")
                     combat_loop()
                 if options_button.draw("Options"):
                     menu_state = "optionsmain"
@@ -83,7 +85,8 @@ def menu():
                                               'Do you want to save before quitting?') == messagebox.YES:
                         save.save()
                     run = False
-                    pygame.quit()
+                    menu_state = "main"
+                    audio.load_music("Menu")
             elif menu_state == "optionspause" or menu_state == "optionsmain":
                 # Display options menu
                 if audio_button.draw("Audio"):
