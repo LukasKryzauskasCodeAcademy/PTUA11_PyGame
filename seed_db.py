@@ -15,6 +15,12 @@ enemy_1_data = EnemyData(
     strength=3,
     potions=1,
 )
+enemy_2_data = EnemyData(
+    name='Heavy Bandit',
+    max_hp=30,
+    strength=5,
+    potions=2,
+)
 
 # Create database and tables
 Base.metadata.create_all(db_engine)
@@ -23,9 +29,10 @@ with Session(db_engine) as session:
 
 # Create record
 database.create(enemy_1_data)
+database.create(enemy_2_data)
 # Read records
-with Session(db_engine) as session:
-    # session.scalars(select(Enemy).where(Enemy.id == record_id)).one()
-    data = session.scalars(select(Enemy)).all()
-    for value in data:
-        print(value.id)
+# with Session(db_engine) as session:
+#     # session.scalars(select(Enemy).where(Enemy.id == record_id)).one()
+#     data = session.scalars(select(Enemy)).all()
+#     for value in data:
+#         print(value.id)

@@ -5,10 +5,10 @@ from tkinter import messagebox
 
 pygame.init()
 from config import Config
-from .Fighter import Fighter, HealthBar
-from .Drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom_panel, screen_height
-from .Widgets import Button, Slider
-from .Audio import AudioPlayer, set_music_volume
+from .fighter import Fighter, HealthBar
+from .drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom_panel, screen_height
+from .widgets import Button, Slider
+from .audio import AudioPlayer, set_music_volume
 from .save_system import SaveFile
 from .db import Database, engine
 from sqlalchemy.orm import Session
@@ -36,7 +36,7 @@ audio = AudioPlayer(save.save_data["music_volume"], save.save_data["effects_volu
 def menu():
     global game_paused, menu_state
     # Create button instances
-    play_button = Button(screen, screen_width / 2 - 100, 100, drawer.button_img, 200, 80)
+    play_button = Button(screen, screen_width / 2 - 100, 200, drawer.button_img, 200, 80)
     resume_button = Button(screen, screen_width / 2 - 100, 200, drawer.button_img, 200, 80)
     options_button = Button(screen, screen_width / 2 - 75, 300, drawer.button_img, 150, 80)
     quit_button = Button(screen, screen_width / 2 - 75, 400, drawer.button_img, 150, 80)
@@ -66,29 +66,30 @@ def menu():
                     game_paused = False
                     combat_loop()
                 if options_button.draw("Options"):
-                    menu_state = "options"
+                    menu_state = "optionsmain"
                 if quit_button.draw("Quit"):
                     if messagebox.askquestion('Are you sure?', 'Do you want to quit?') == messagebox.YES:
                         save.save()
                         run = False
+                        pygame.quit()
             elif menu_state == "pause":
                 # Display pause screen menu
                 if resume_button.draw("Resume"):
                     game_paused = False
                 if options_button.draw("Options"):
-                    menu_state = "options"
+                    menu_state = "optionspause"
                 if quit_button.draw("Quit"):
                     if messagebox.askquestion('Are you sure?',
                                               'Do you want to save before quitting?') == messagebox.YES:
                         save.save()
-                    else:
-                        run = False
-            elif menu_state == "options":
+                    run = False
+                    pygame.quit()
+            elif menu_state == "optionspause" or menu_state == "optionsmain":
                 # Display options menu
                 if audio_button.draw("Audio"):
                     menu_state = "audio"
                 if back_button.draw("Back"):
-                    menu_state = "main"
+                    menu_state = menu_state[7:]
             elif menu_state == "audio":
                 draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
                 draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
@@ -123,9 +124,10 @@ def combat_loop():
     global game_paused, menu_state
     # Create each fighter object
     enemy1 = database.read(1)
+    enemy2 = database.read(2)
     knight = Fighter(200, 260, 'Knight', 30, 10, 3)
     bandit1 = Fighter(550, 270, enemy1.name, enemy1.max_hp, enemy1.strength, enemy1.potions)
-    bandit2 = Fighter(700, 270, 'Bandit', 20, 6, 1)
+    bandit2 = Fighter(700, 270, enemy2.name, enemy2.max_hp, enemy2.strength, enemy2.potions)
     bandit_list = [bandit1, bandit2]
 
     # Create each fighters healthBar
@@ -304,6 +306,5 @@ def combat_loop():
 def run_game():
     # Parameters
     pygame.display.set_caption(conf.APP_NAME)
-    # TODO Load sqlalchemy data
     menu()
     pygame.quit()

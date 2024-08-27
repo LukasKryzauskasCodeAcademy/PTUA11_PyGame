@@ -1,5 +1,5 @@
 import pygame
-from .Drawing import draw_button_text
+from .drawing import draw_button_text
 
 
 class Button:

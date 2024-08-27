@@ -1,12 +1,14 @@
+import os
+
 import pygame
 import random
-from .Drawing import DamageText
+from .drawing import DamageText
 
 
 class Fighter:
     def __load_images(self, action_name, frames):
         temp_list = []
-        for i in range(frames):
+        for i in range(len(os.listdir(f'app/img/{self.name}/{action_name}/'))):
             img = pygame.image.load(f'app/img/{self.name}/{action_name}/{i}.png')
             # This is for up scaling the image, because it's too small, scaling three times in each direction
             img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))

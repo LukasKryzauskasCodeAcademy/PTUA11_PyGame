@@ -1,1 +1,1 @@
-{"music_volume": 0.10552763819095477, "effects_volume": 0.24120603015075376}
+{"music_volume": 0.10552763819095477, "effects_volume": 0.628140703517588}
