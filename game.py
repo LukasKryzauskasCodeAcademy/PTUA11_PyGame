@@ -1,4 +1,6 @@
-from app import CreateApp
+from app import run_game
 
-app = CreateApp()
+if __name__ == "__main__":
+    run_game()
+
 

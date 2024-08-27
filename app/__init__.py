@@ -1,3 +1,5 @@
+from sys import modules
+
 import pygame
 from tkinter import messagebox
 
@@ -8,9 +10,14 @@ from .Drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom
 from .Widgets import Button, Slider
 from .Audio import AudioPlayer, set_music_volume
 from .save_system import SaveFile
+from .db import Database, engine
+from sqlalchemy.orm import Session
 
 conf = Config()
 save = SaveFile()
+
+with Session(engine(conf.SQLALCHEMY_DATABASE_URI)) as session:
+    database = Database(session)
 
 # Parameters
 clock = pygame.time.Clock()
@@ -61,7 +68,7 @@ def menu():
                 if options_button.draw("Options"):
                     menu_state = "options"
                 if quit_button.draw("Quit"):
-                    if messagebox.askquestion('Are you sure?','Do you want to quit?') == messagebox.YES:
+                    if messagebox.askquestion('Are you sure?', 'Do you want to quit?') == messagebox.YES:
                         save.save()
                         run = False
             elif menu_state == "pause":
@@ -71,7 +78,8 @@ def menu():
                 if options_button.draw("Options"):
                     menu_state = "options"
                 if quit_button.draw("Quit"):
-                    if messagebox.askquestion('Are you sure?','Do you want to save before quitting?') == messagebox.YES:
+                    if messagebox.askquestion('Are you sure?',
+                                              'Do you want to save before quitting?') == messagebox.YES:
                         save.save()
                     else:
                         run = False
@@ -114,8 +122,9 @@ def menu():
 def combat_loop():
     global game_paused, menu_state
     # Create each fighter object
+    enemy1 = database.read(1)
     knight = Fighter(200, 260, 'Knight', 30, 10, 3)
-    bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
+    bandit1 = Fighter(550, 270, enemy1.name, enemy1.max_hp, enemy1.strength, enemy1.potions)
     bandit2 = Fighter(700, 270, 'Bandit', 20, 6, 1)
     bandit_list = [bandit1, bandit2]
 
@@ -292,8 +301,9 @@ def combat_loop():
         pygame.display.update()
 
 
-class CreateApp:
+def run_game():
     # Parameters
     pygame.display.set_caption(conf.APP_NAME)
+    # TODO Load sqlalchemy data
     menu()
     pygame.quit()

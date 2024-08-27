@@ -18,5 +18,3 @@ class SaveFile:
         if os.path.isfile('save.txt'):
             with open('save.txt') as test_file:
                 self.save_data = json.load(test_file)
-                for entry in self.save_data:
-                    print(entry)
