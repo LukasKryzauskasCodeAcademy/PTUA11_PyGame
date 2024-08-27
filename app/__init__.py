@@ -7,8 +7,10 @@ from .Fighter import Fighter, HealthBar
 from .Drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom_panel, screen_height
 from .Widgets import Button, Slider
 from .Audio import AudioPlayer, set_music_volume
+from .save_system import SaveFile
 
 conf = Config()
+save = SaveFile()
 
 # Parameters
 clock = pygame.time.Clock()
@@ -21,7 +23,7 @@ menu_state = "main"
 # Group is similar to python list
 damage_text_group = pygame.sprite.Group()
 drawer = Drawer()
-audio = AudioPlayer()
+audio = AudioPlayer(save.save_data["music_volume"], save.save_data["effects_volume"])
 
 
 def menu():
@@ -37,7 +39,7 @@ def menu():
 
     # Audio slider
     music_slider = Slider((screen_width // 2, screen_height // 2 - 100), (200, 30), audio.music_volume, 0, 1)
-    effects_slider = Slider((screen_width // 2, screen_height // 2), (200, 30), audio.effects_volume, 0, 100)
+    effects_slider = Slider((screen_width // 2, screen_height // 2), (200, 30), audio.effects_volume, 0, 1)
     sliders = [music_slider, effects_slider]
 
     # Game loop
@@ -60,6 +62,7 @@ def menu():
                     menu_state = "options"
                 if quit_button.draw("Quit"):
                     if messagebox.askquestion('Are you sure?','Do you want to quit?') == messagebox.YES:
+                        save.save()
                         run = False
             elif menu_state == "pause":
                 # Display pause screen menu
@@ -69,8 +72,7 @@ def menu():
                     menu_state = "options"
                 if quit_button.draw("Quit"):
                     if messagebox.askquestion('Are you sure?','Do you want to save before quitting?') == messagebox.YES:
-                        #TODO implement saving
-                        pass
+                        save.save()
                     else:
                         run = False
             elif menu_state == "options":
@@ -87,8 +89,10 @@ def menu():
                         slider.move_slider(mouse_pos)
                         if count == 0:
                             set_music_volume(slider.get_value())
+                            save.save_data["music_volume"] = slider.get_value()
                         elif count == 1:
                             audio.set_effects_volume(slider.get_value())
+                            save.save_data["effects_volume"] = slider.get_value()
                     slider.render(screen)
                 if back_button.draw("Back"):
                     menu_state = "options"
@@ -102,6 +106,7 @@ def menu():
                 if event.key == pygame.K_ESCAPE:
                     game_paused = True
             if event.type == pygame.QUIT:
+                save.save()
                 run = False
         pygame.display.update()
 
