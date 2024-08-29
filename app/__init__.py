@@ -1,3 +1,4 @@
+import sys
 from sys import modules
 
 import pygame
@@ -24,7 +25,7 @@ clock = pygame.time.Clock()
 fps = conf.FPS
 
 # Game variables
-game_paused = True
+game_paused = False
 menu_state = "main"
 
 # Group is similar to python list
@@ -56,61 +57,62 @@ def menu():
         screen.fill((52, 78, 91))
         mouse_pos = pygame.mouse.get_pos()
         mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
-        # Check if game is paused
-        if game_paused:
-            # Check menu state
-            if menu_state == "main":
-                # Display main menu
-                draw_text("Pygame rpg project", "red", 290, 100)
-                if play_button.draw("Play"):
-                    menu_state = "pause"
-                    game_paused = False
-                    audio.load_music("Combat")
-                    combat_loop()
-                if options_button.draw("Options"):
-                    menu_state = "optionsmain"
-                if quit_button.draw("Quit"):
-                    if messagebox.askquestion('Are you sure?', 'Do you want to quit?') == messagebox.YES:
-                        save.save()
-                        run = False
-                        pygame.quit()
-            elif menu_state == "pause":
-                # Display pause screen menu
-                if resume_button.draw("Resume"):
-                    game_paused = False
-                if options_button.draw("Options"):
-                    menu_state = "optionspause"
-                if quit_button.draw("Quit"):
-                    if messagebox.askquestion('Are you sure?',
-                                              'Do you want to save before quitting?') == messagebox.YES:
-                        save.save()
+
+        # Check menu state
+        if menu_state == "main":
+            # Display main menu
+            draw_text("Pygame rpg project", "red", 290, 100)
+            if play_button.draw("Play"):
+                menu_state = "pause"
+                game_paused = False
+                audio.load_music("Combat")
+                combat_loop()
+            if options_button.draw("Options"):
+                menu_state = "options"
+            if quit_button.draw("Quit"):
+                if messagebox.askquestion('Are you sure?', 'Do you want to quit?') == messagebox.YES:
+                    save.save()
                     run = False
+                    pygame.quit()
+        elif menu_state == "pause":
+            # Display pause screen menu
+            if resume_button.draw("Resume"):
+                game_paused = False
+                run = False
+            if options_button.draw("Options"):
+                menu_state = "options"
+            if quit_button.draw("Quit"):
+                if messagebox.askquestion('Are you sure?',
+                                          'Do you want to save before quitting?') == messagebox.YES:
+                    save.save()
+                game_paused = False
+                menu_state = "main"
+                audio.load_music("Menu")
+        elif menu_state == "options":
+            # Display options menu
+            if audio_button.draw("Audio"):
+                menu_state = "audio"
+            if back_button.draw("Back"):
+                if game_paused:
+                    menu_state = "pause"
+                else:
                     menu_state = "main"
-                    audio.load_music("Menu")
-            elif menu_state == "optionspause" or menu_state == "optionsmain":
-                # Display options menu
-                if audio_button.draw("Audio"):
-                    menu_state = "audio"
-                if back_button.draw("Back"):
-                    menu_state = menu_state[7:]
-            elif menu_state == "audio":
-                draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
-                draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
-                for count, slider in enumerate(sliders):
-                    if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
-                        slider.move_slider(mouse_pos)
-                        if count == 0:
-                            set_music_volume(slider.get_value())
-                            save.save_data["music_volume"] = slider.get_value()
-                        elif count == 1:
-                            audio.set_effects_volume(slider.get_value())
-                            save.save_data["effects_volume"] = slider.get_value()
-                    slider.render(screen)
-                if back_button.draw("Back"):
-                    menu_state = "options"
-        else:
-            game_paused = False
-            run = False
+        elif menu_state == "audio":
+            draw_text("Music", "white", screen_width // 2 - 35, screen_height // 2 - 150)
+            draw_text("Sound Effects", "white", screen_width // 2 - 70, screen_height // 2 - 50)
+            for count, slider in enumerate(sliders):
+                if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
+                    slider.move_slider(mouse_pos)
+                    if count == 0:
+                        set_music_volume(slider.get_value())
+                        save.save_data["music_volume"] = slider.get_value()
+                    elif count == 1:
+                        audio.set_effects_volume(slider.get_value())
+                        save.save_data["effects_volume"] = slider.get_value()
+                slider.render(screen)
+            if back_button.draw("Back"):
+                menu_state = "options"
+
 
         # Event handler
         for event in pygame.event.get():
@@ -120,6 +122,8 @@ def menu():
             if event.type == pygame.QUIT:
                 save.save()
                 run = False
+                if game_paused == False and menu_state == 'main':
+                    sys.exit()
         pygame.display.update()
 
 
@@ -147,7 +151,6 @@ def combat_loop():
     game_over = 0
 
     # Function for game loop
-
     run = True
     while run:
         clock.tick(fps)
@@ -302,7 +305,9 @@ def combat_loop():
                     menu_state = "pause"
             if event.type == pygame.QUIT:
                 run = False
-
+                game_paused = False
+                menu_state = "main"
+                audio.load_music("Menu")
         pygame.display.update()
 
 

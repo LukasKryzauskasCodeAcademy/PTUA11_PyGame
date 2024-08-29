@@ -6,7 +6,7 @@ from .drawing import DamageText
 
 
 class Fighter:
-    def __load_images(self, action_name, frames):
+    def __load_images(self, action_name):
         temp_list = []
         for i in range(len(os.listdir(f'app/img/{self.name}/{action_name}/'))):
             img = pygame.image.load(f'app/img/{self.name}/{action_name}/{i}.png')
@@ -29,10 +29,10 @@ class Fighter:
         self.action = 0  # 0-Idle, 1-Attack, 2-Hurt, 3-Dead
         self.update_time = pygame.time.get_ticks()
         # Load images
-        self.__load_images('Idle', 8)
-        self.__load_images('Attack', 8)
-        self.__load_images('Hurt', 3)
-        self.__load_images('Death', 10)
+        self.__load_images('Idle')
+        self.__load_images('Attack')
+        self.__load_images('Hurt')
+        self.__load_images('Death')
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()  # Invisible property that shows width and height of image
