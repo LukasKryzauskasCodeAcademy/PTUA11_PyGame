@@ -69,11 +69,7 @@ class Fighter:
         target.hp -= damage
         # Run enemy hurt animation
         target.animation(2)
-        # Check if target is dead
-        if target.hp < 1:
-            target.hp = 0
-            target.alive = False
-            target.animation(3)
+        check_death(target)
         damage_text = DamageText(target.rect.centerx, target.rect.y, str(damage), "red")
         damage_text_group.add(damage_text)
         # Set variables to attack animation
@@ -89,6 +85,14 @@ class Fighter:
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+
+def check_death(target: Fighter):
+    # Check if target is dead
+    if target.hp < 1:
+        target.hp = 0
+        target.alive = False
+        target.animation(3)
 
 
 class HealthBar:

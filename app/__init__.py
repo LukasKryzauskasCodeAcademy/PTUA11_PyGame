@@ -6,7 +6,7 @@ from tkinter import messagebox
 
 pygame.init()
 from config import Config
-from .fighter import Fighter, HealthBar
+from .fighter import Fighter, HealthBar, check_death
 from .drawing import Drawer, DamageText, draw_text, screen, screen_width, bottom_panel, screen_height
 from .widgets import Button, Slider
 from .audio import AudioPlayer, set_music_volume
@@ -57,6 +57,7 @@ def menu():
         screen.fill((52, 78, 91))
         mouse_pos = pygame.mouse.get_pos()
         mouse = pygame.mouse.get_pressed()  # 0-Left click, 1-Middle click, 2-Right click
+        pygame.mouse.set_visible(True)
 
         # Check menu state
         if menu_state == "main":
@@ -65,8 +66,11 @@ def menu():
             if play_button.draw("Play"):
                 menu_state = "pause"
                 game_paused = False
+                if messagebox.askquestion('New game', 'Do you want to start a new save?') == messagebox.YES:
+                    combat_loop(True)
+                else:
+                    combat_loop(False)
                 audio.load_music("Combat")
-                combat_loop()
             if options_button.draw("Options"):
                 menu_state = "options"
             if quit_button.draw("Quit"):
@@ -85,6 +89,8 @@ def menu():
                 if messagebox.askquestion('Are you sure?',
                                           'Do you want to save before quitting?') == messagebox.YES:
                     save.save()
+                else:
+                    save.load()
                 game_paused = False
                 menu_state = "main"
                 audio.load_music("Menu")
@@ -127,24 +133,35 @@ def menu():
         pygame.display.update()
 
 
-def combat_loop():
+def combat_loop(new_game: bool):
     global game_paused, menu_state
     # Create each fighter object
     enemy1 = database.read(1)
     enemy2 = database.read(2)
     knight = Fighter(200, 260, 'Knight', 30, 10, 3)
-    bandit1 = Fighter(550, 270, enemy1.name, enemy1.max_hp, enemy1.strength, enemy1.potions)
-    bandit2 = Fighter(700, 270, enemy2.name, enemy2.max_hp, enemy2.strength, enemy2.potions)
-    bandit_list = [bandit1, bandit2]
+    enemy1 = Fighter(550, 270, enemy1.name, enemy1.max_hp, enemy1.strength, enemy1.potions)
+    enemy2 = Fighter(700, 270, enemy2.name, enemy2.max_hp, enemy2.strength, enemy2.potions)
+    bandit_list = [enemy1, enemy2]
+    # Update hp from save file
+    if not new_game:
+        knight.hp = save.save_data["knight.hp"]
+        knight.potions = save.save_data["knight.potions"]
+        enemy1.hp = save.save_data["enemy1.hp"]
+        enemy1.potions = save.save_data["enemy1.potions"]
+        check_death(enemy1)
+        enemy2.hp = save.save_data["enemy2.hp"]
+        enemy2.potions = save.save_data["enemy2.potions"]
+        check_death(enemy2)
+
 
     # Create each fighters healthBar
     knight_health_bar = HealthBar(100, screen_height - bottom_panel + 40, knight.hp, knight.max_hp)
-    bandit1_health_bar = HealthBar(550, screen_height - bottom_panel + 40, bandit1.hp, bandit1.max_hp)
-    bandit2_health_bar = HealthBar(550, screen_height - bottom_panel + 100, bandit2.hp, bandit2.max_hp)
+    enemy1_health_bar = HealthBar(550, screen_height - bottom_panel + 40, enemy1.hp, enemy1.max_hp)
+    enemy2_health_bar = HealthBar(550, screen_height - bottom_panel + 100, enemy2.hp, enemy2.max_hp)
 
     # Define game variables
-    current_fighter = 1  # 1- player
-    total_fighters = len(bandit_list) + current_fighter
+    current_fighter = 1 if new_game else save.save_data["current_fighter"]  # 1- player
+    total_fighters = len(bandit_list) + 1
     action_cooldown = 0
     action_wait_time = 90
     potion_effect = 15
@@ -153,6 +170,7 @@ def combat_loop():
     # Function for game loop
     run = True
     while run:
+        print(knight.potions, enemy1.potions, enemy2.potions)
         clock.tick(fps)
 
         if game_paused:
@@ -162,8 +180,8 @@ def combat_loop():
         # Draw panel
         drawer.draw_panel(knight, bandit_list)
         knight_health_bar.draw(knight.hp, screen)
-        bandit1_health_bar.draw(bandit1.hp, screen)
-        bandit2_health_bar.draw(bandit2.hp, screen)
+        enemy1_health_bar.draw(enemy1.hp, screen)
+        enemy2_health_bar.draw(enemy2.hp, screen)
         # Create buttons
         potion_button = Button(screen, 100, screen_height - bottom_panel + 70, drawer.potion_img, 64, 64)
         restart_button = Button(screen, 330, 120, drawer.restart_img, 120, 30)
@@ -303,6 +321,14 @@ def combat_loop():
                 if event.key == pygame.K_ESCAPE:
                     game_paused = True
                     menu_state = "pause"
+                    #Prepare data for saving in case user wants to quit
+                    save.save_data["current_fighter"] = current_fighter
+                    save.save_data["knight.hp"] = knight.hp
+                    save.save_data["knight.potions"] = knight.potions
+                    save.save_data["enemy1.hp"] = enemy1.hp
+                    save.save_data["enemy1.potions"] = enemy1.potions
+                    save.save_data["enemy2.hp"] = enemy2.hp
+                    save.save_data["enemy2.potions"] = enemy2.potions
             if event.type == pygame.QUIT:
                 run = False
                 game_paused = False
