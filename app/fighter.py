@@ -65,6 +65,8 @@ class Fighter:
 
         rand = random.randint(-5, 5)
         damage = self.strength + rand
+        if damage < 1:
+            damage = 1
         # Deal damage to enemy
         target.hp -= damage
         # Run enemy hurt animation
