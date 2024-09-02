@@ -62,15 +62,17 @@ def menu():
         # Check menu state
         if menu_state == "main":
             # Display main menu
-            draw_text("Pygame rpg project", "red", 290, 100)
+            screen.blit(drawer.logo_img, (277, -10))
+            draw_text("RPG", "red", 375, 50)
             if play_button.draw("Play"):
                 menu_state = "pause"
                 game_paused = False
                 if messagebox.askquestion('New game', 'Do you want to start a new save?') == messagebox.YES:
+                    audio.load_music("Combat")
                     combat_loop(True)
                 else:
+                    audio.load_music("Combat")
                     combat_loop(False)
-                audio.load_music("Combat")
             if options_button.draw("Options"):
                 menu_state = "options"
             if quit_button.draw("Quit"):
@@ -119,7 +121,6 @@ def menu():
             if back_button.draw("Back"):
                 menu_state = "options"
 
-
         # Event handler
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -153,7 +154,6 @@ def combat_loop(new_game: bool):
         enemy2.potions = save.save_data["enemy2.potions"]
         check_death(enemy2)
 
-
     # Create each fighters healthBar
     knight_health_bar = HealthBar(100, screen_height - bottom_panel + 40, knight.hp, knight.max_hp)
     enemy1_health_bar = HealthBar(550, screen_height - bottom_panel + 40, enemy1.hp, enemy1.max_hp)
@@ -170,7 +170,6 @@ def combat_loop(new_game: bool):
     # Function for game loop
     run = True
     while run:
-        print(knight.potions, enemy1.potions, enemy2.potions)
         clock.tick(fps)
 
         if game_paused:
@@ -321,7 +320,7 @@ def combat_loop(new_game: bool):
                 if event.key == pygame.K_ESCAPE:
                     game_paused = True
                     menu_state = "pause"
-                    #Prepare data for saving in case user wants to quit
+                    # Prepare data for saving in case user wants to quit
                     save.save_data["current_fighter"] = current_fighter
                     save.save_data["knight.hp"] = knight.hp
                     save.save_data["knight.potions"] = knight.potions

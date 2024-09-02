@@ -42,6 +42,9 @@ class Drawer:
     # Load Victory and Defeat images
     victory_img = pygame.image.load('app/img/Icons/victory.png').convert_alpha()
     defeat_img = pygame.image.load('app/img/Icons/defeat.png').convert_alpha()
+    # Load game logo
+    logo_img = pygame.image.load('app/img/Icons/logo.png').convert_alpha()
+    logo_img = pygame.transform.scale(logo_img, (logo_img.get_width() *0.4, logo_img.get_height() *0.35))
 
     # Function for drawing background
     def draw_bg(self):
